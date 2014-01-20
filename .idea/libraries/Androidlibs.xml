@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Androidlibs">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/Ouya/libs" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/Ouya/libs" recursive="false" />
+  </library>
+</component>

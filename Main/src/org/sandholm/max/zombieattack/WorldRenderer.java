@@ -86,8 +86,8 @@ public class WorldRenderer {
         geometryRenderer.begin(ShapeType.Filled);
         // draw ground
         geometryRenderer.setColor(new Color(0, 0, 0, 1)); //set color of drawing
-        geometryRenderer.rectLine(world.levelBounds.x, world.levelBounds.y
-                                , world.levelBounds.width, world.levelBounds.y, 0.01f); //draw the ground
+        geometryRenderer.rectLine(world.getLevelBounds().x, world.getLevelBounds().y
+                                , world.getLevelBounds().width, world.getLevelBounds().y, 0.01f); //draw the ground
 
         // draw arm and gun
         Player player = world.getPlayer();
@@ -100,13 +100,20 @@ public class WorldRenderer {
         if (player.getGunAngle() < 90 || player.getGunAngle() > 270) {                          //if pointing right
             geometryRenderer.rectLine(0.23f, 0.03f*gunViewAngle, 0.4f, 0.03f*gunViewAngle, 0.03f);   //draw the gun
             geometryRenderer.rectLine(0.23f, 0.03f*gunViewAngle, 0.16f, -0.03f*gunViewAngle, 0.02f);
+            player.setBarrelEnd(new Vector2(0.4f, 0.03f*gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
         }
         else {                                                                                   //if pointing left
             geometryRenderer.rectLine(0.23f, -0.03f*gunViewAngle, 0.4f, -0.03f*gunViewAngle, 0.03f); //draw the gun
             geometryRenderer.rectLine(0.23f, -0.03f*gunViewAngle, 0.16f, 0.03f*gunViewAngle, 0.02f);
+            player.setBarrelEnd(new Vector2(0.4f, -0.03f*gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
+        }
+        geometryRenderer.identity();
+        //draw all bullets
+        Array<Bullet> bullets = world.getBullets();
+        for (Bullet bullet : bullets) {
+            geometryRenderer.rectLine(bullet.getPosition(), bullet.getPosition().cpy().add(bullet.getVelocity().cpy().clamp(0.8f,0.8f)), 0.01f);
         }
         geometryRenderer.end();
-        geometryRenderer.identity();
     }
 
     private void drawDebug() {
@@ -114,7 +121,8 @@ public class WorldRenderer {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeType.Line);
         debugRenderer.setColor(new Color(1, 0, 0, 1));
-        debugRenderer.rect(world.levelBounds.x, world.levelBounds.y, world.levelBounds.width, world.levelBounds.height);
+        debugRenderer.rect(world.getLevelBounds().x, world.getLevelBounds().y
+                         , world.getLevelBounds().width, world.getLevelBounds().height);
         // render player
         Player player = world.getPlayer();
         Rectangle rect = player.getBounds();

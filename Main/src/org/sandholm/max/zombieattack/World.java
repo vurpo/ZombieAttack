@@ -9,9 +9,17 @@ import com.badlogic.gdx.utils.Array;
  */
 public class World {
 
-    Rectangle levelBounds = new Rectangle();
-    Player player = new Player(new Vector2(8f, 4f));
+    public Rectangle getLevelBounds() {
+        return levelBounds;
+    }
+
+    private Rectangle levelBounds = new Rectangle();
+    Player player;
+
     Array<Zombie> zombies = new Array<Zombie>();
+
+
+    Array<Bullet> bullets = new Array<Bullet>();
 
     public Player getPlayer() {
         return player;
@@ -31,11 +39,21 @@ public class World {
         return zombies;
     }
 
+    public Bullet spawnBullet (Vector2 position, float direction, float velocity) {
+        bullets.add(new Bullet(position, direction, velocity));
+        return bullets.peek();
+    }
+
+    public Array<Bullet> getBullets() {
+        return bullets;
+    }
+
     public World() {
         createWorld();
     }
 
     private void createWorld() {
+        player = new Player(new Vector2(8f, 4f), this);
         levelBounds.width = 16.0f;
         levelBounds.height = 5.0f;
         levelBounds.x = 0f;

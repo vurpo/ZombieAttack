@@ -21,6 +21,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     private WorldRenderer renderer;
     private PlayerController playerController;
     private ZombieController zombieController;
+    private BulletController bulletController;
 
     private boolean runningOnOuya;
     private boolean controllerIsOuya;
@@ -33,6 +34,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
         playerController.update(delta);
         zombieController.update(delta);
         renderer.render();
+        bulletController.update(delta);
     }
 
 
@@ -44,9 +46,10 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     @Override
     public void show() {
         world = new World();
-        renderer = new WorldRenderer(world, true);  //world, debug rendering
+        renderer = new WorldRenderer(world, false);  //world, debug rendering
         playerController = new PlayerController(world);
         zombieController = new ZombieController(world);
+        bulletController = new BulletController(world);
         if (Controllers.getControllers().size >= 1) {
             controller = Controllers.getControllers().first();
         }
@@ -95,6 +98,9 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
             if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftPressed();
             else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightPressed();
             else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpPressed();
+            else if (i == Ouya.BUTTON_R2) {
+                playerController.fireBullet();
+            }
             return true;
         }
         return false;
@@ -106,9 +112,6 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
             if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftReleased();
             else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightReleased();
             else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpReleased();
-            /*FOR DEBUG PURPOSES, REMOVE WHEN THERE'S PROPER ZOMBIE SPAWNING*/
-            else if (i == Ouya.BUTTON_O) world.spawnZombie(true);
-            else if (i == Ouya.BUTTON_A) world.spawnZombie(false);
             return true;
         }
         return false;

@@ -1,14 +1,17 @@
 package org.sandholm.max.zombieattack;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by max on 1/18/14.
  */
 public class PlayerController {
+    private float lastDelta;
+
     enum Keys {
         LEFT, RIGHT, JUMP, FIRE
     }
@@ -88,39 +91,52 @@ public class PlayerController {
         keys.get(keys.put(Keys.JUMP, false));
     }
 
+    public void fireBullet() {
+        world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY);
+    }
+
     /** The main update method **/
     public void update(float delta) {
+        lastDelta = delta;
         processInput();
         player.update(delta);
     }
 
     /** Change the player's state and parameters based on input controls **/
     private void processInput() {
+        Rectangle tempPlayerBounds = new Rectangle(player.getBounds());
+        Vector2 tempPlayerVelocity = new Vector2(player.getVelocity());
+        Player.State tempPlayerState = player.getState();
         //velocity controls
         if (keys.get(Keys.LEFT)) {
             // left is pressed
             player.setFacingLeft(true);
-            player.setState(Player.State.WALKING);
-            player.getVelocity().x = -Player.SPEED;
+            tempPlayerState = Player.State.WALKING;
+            tempPlayerVelocity.x = -Player.SPEED;
         }
         if (keys.get(Keys.RIGHT)) {
             // left is pressed
             player.setFacingLeft(false);
-            player.setState(Player.State.WALKING);
-            player.getVelocity().x = Player.SPEED;
+            tempPlayerState = Player.State.WALKING;
+            tempPlayerVelocity.x = Player.SPEED;
         }
 
         if (xAxisAmount != 0) {
             player.setFacingLeft(xAxisAmount < 0);
-            player.setState(Player.State.WALKING);
-            player.getVelocity().x = Player.SPEED*xAxisAmount;
+            tempPlayerState = Player.State.WALKING;
+            tempPlayerVelocity.x = Player.SPEED*xAxisAmount;
         }
         else if ((keys.get(Keys.LEFT) && keys.get(Keys.RIGHT)) ||
                 (!keys.get(Keys.LEFT) && !(keys.get(Keys.RIGHT)))) {
             player.setState(Player.State.IDLE);
             // horizontal speed is 0
-            player.getVelocity().x = 0;
+            tempPlayerVelocity.x = 0;
         }
+
+        player.setState(tempPlayerState);
+        player.setVelocity(tempPlayerVelocity);
+
+
 
         //gun controls
         if (rightAxis.len() > 0.5f) { //deadzone

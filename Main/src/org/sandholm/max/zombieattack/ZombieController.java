@@ -27,7 +27,7 @@ public class ZombieController {
         }
         spawnZombieTimeout--;
         for (Zombie zombie : zombies) {
-            if (world.levelBounds.overlaps(zombie.getBounds())) {
+            if (world.getLevelBounds().overlaps(zombie.getBounds())) {
                 zombie.update(delta);
             }
             else {

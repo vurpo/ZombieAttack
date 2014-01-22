@@ -6,9 +6,8 @@ import com.badlogic.gdx.math.Vector2;
  * Created by max on 1/20/14.
  */
 public class Bullet {
-    Vector2 position = new Vector2();
-    float gravity = 0;
-    Vector2 velocity = new Vector2();
+    private Vector2 position = new Vector2();
+    private Vector2 velocity = new Vector2();
 
     public Bullet(Vector2 position, float direction, float velocity) {
         this.position = position;
@@ -17,10 +16,17 @@ public class Bullet {
     }
 
     public void update(float delta) {
-        velocity.y -= delta;
+        velocity.y -= 8*delta;
         position.add(velocity.cpy().scl(delta));
     }
 
+    public Vector2 getPosition() {
+        return this.position;
+    }
+
+    public Vector2 getVelocity() {
+        return this.velocity;
+    }
 }
 
 /*var Bullet = function(x,y,direction,velocity) {

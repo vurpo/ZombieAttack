@@ -133,10 +133,14 @@ public class PlayerController {
             tempPlayerVelocity.x = 0;
         }
 
+
         player.setState(tempPlayerState);
         player.setVelocity(tempPlayerVelocity);
 
 
+        if (keys.get(Keys.JUMP)) {
+            player.jump();
+        }
 
         //gun controls
         if (rightAxis.len() > 0.5f) { //deadzone

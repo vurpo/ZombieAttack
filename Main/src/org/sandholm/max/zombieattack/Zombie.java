@@ -16,8 +16,12 @@ public class Zombie {
     Rectangle bounds = new Rectangle();
     Random random = new Random();
     boolean facingLeft;
+    World world;
 
-    public Zombie(Vector2 position, boolean facingLeft) {
+    int health = 100;
+
+    public Zombie(Vector2 position, boolean facingLeft, World world) {
+        this.world = world;
         this.bounds.setPosition(position);
         this.bounds.height = 1f;
         this.bounds.width = 0.5f;
@@ -26,6 +30,19 @@ public class Zombie {
         if (facingLeft) {
             velocity.x = -velocity.x;
         }
+    }
+
+    public boolean damage(int amount) {  //returns true if zombie died
+        health -= amount;
+        if (health <= 0) {
+            die();
+            return true;
+        }
+        return false;
+    }
+
+    public void die() {
+        world.killZombie(this);
     }
 
     public void update(float delta) {

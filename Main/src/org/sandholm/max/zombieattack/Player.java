@@ -18,11 +18,13 @@ public class Player {
     }
 
     public enum State {
-        IDLE, WALKING, JUMPING
+        IDLE, WALKING
     }
 
+    public boolean jumping = false;
+
     static final float SPEED = 3.0f;
-    static final float JUMP_VELOCITY =  1.0f;
+    static final float JUMP_VELOCITY =  2.0f;
     static final float BULLET_VELOCITY = 48f;
 
     Vector2 velocity = new Vector2();
@@ -46,22 +48,27 @@ public class Player {
         this.world = world;
     }
 
-    public boolean isInsideWorldBounds(float delta) {
+    public boolean isInsideLevelBounds(float delta) {
         Vector2 position = new Vector2(getPosition());
         position.add(velocity.cpy().scl(delta));
-        if (position.x >= world.getLevelBounds().x
-         && position.x+getBounds().width <= world.getLevelBounds().x+world.getLevelBounds().width) {
-            return true;
-        }
-        return false;
+        return position.x >= world.getLevelBounds().x && position.x+getBounds().width <= world.getLevelBounds().x+world.getLevelBounds().width;
     }
 
     public void update(float delta) {
         Vector2 position = new Vector2(getPosition());
+        if (velocity.y != 0f) {
+            velocity.y -= 8*delta;  //I'm falling!
+        }
         position.add(velocity.cpy().scl(delta));
-        if (!isInsideWorldBounds(delta)){
-            velocity.set(0f, 0f);
+        if (!isInsideLevelBounds(delta)){
+            velocity.x = 0f;
+            setState(State.IDLE); //we don't want the player to walk out of the world
             return;
+        }
+        if (position.y <= world.getLevelBounds().y) { //is the player at or below ground level?
+            velocity.y = 0f;                           //set the player to ground level and his y-velocity to 0
+            position.y = world.getLevelBounds().y;
+            jumping = false;
         }
         bounds.setPosition(position);
 
@@ -81,6 +88,14 @@ public class Player {
 
     public void setState(State newState) {
         this.state = newState;
+    }
+
+    public void jump() {
+        if (!jumping) {
+            getVelocity().y = JUMP_VELOCITY;
+            bounds.getPosition(new Vector2()).y = 5f;
+            jumping = true;
+        }
     }
 
     public void setFacingLeft(boolean facingLeft) {
@@ -104,8 +119,8 @@ public class Player {
     }
 
     public Vector2 getBarrelEnd() {
-        return getPosition().cpy().add(new Vector2(0.26f, 0.72f)).add(barrelEnd);
-    }
+        return getPosition().cpy().add(new Vector2(0.26f, 0.72f)).add(barrelEnd); //this is the in-world position
+    }                                                                             //of the tip of the gun's barrel
 
     public void setBarrelEnd(Vector2 barrelEnd) {
         this.barrelEnd = barrelEnd;

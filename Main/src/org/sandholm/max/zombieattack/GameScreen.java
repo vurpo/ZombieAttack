@@ -98,7 +98,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
             if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftPressed();
             else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightPressed();
             else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpPressed();
-            else if (i == Ouya.BUTTON_R2) {
+            else if (i == Ouya.BUTTON_R1) {
                 playerController.fireBullet();
             }
             return true;
@@ -124,8 +124,8 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
                 playerController.xAxis(v);
                 return true;
             }
-            else if (i == Ouya.AXIS_LEFT_Y && v <= -0.5f) {
-                if (v <= -0.5f) {
+            else if (i == Ouya.AXIS_LEFT_Y) {
+                if (v <= -0.6f) {
                     playerController.jumpPressed();
                 }
                 else {

@@ -27,12 +27,16 @@ public class World {
 
     public Zombie spawnZombie(boolean leftSide) {
         if (leftSide) {
-            zombies.add(new Zombie(new Vector2(-0.45f, levelBounds.y), false));
+            zombies.add(new Zombie(new Vector2(-0.45f, levelBounds.y), false, this));
         }
         else {
-            zombies.add(new Zombie(new Vector2(levelBounds.width-0.05f, levelBounds.y), true));
+            zombies.add(new Zombie(new Vector2(levelBounds.width-0.05f, levelBounds.y), true, this));
         }
         return zombies.peek();
+    }
+
+    public void killZombie(Zombie zombie){
+        zombies.removeValue(zombie, false);
     }
 
     public Array<Zombie> getZombies() {
@@ -42,6 +46,10 @@ public class World {
     public Bullet spawnBullet (Vector2 position, float direction, float velocity) {
         bullets.add(new Bullet(position, direction, velocity));
         return bullets.peek();
+    }
+
+    public void deleteBullet(Bullet bullet) {
+        bullets.removeValue(bullet, false);
     }
 
     public Array<Bullet> getBullets() {

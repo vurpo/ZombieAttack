@@ -1,5 +1,7 @@
 package org.sandholm.max.zombieattack;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
@@ -29,10 +31,39 @@ public class ZombieController {
         for (Zombie zombie : zombies) {
             if (world.getLevelBounds().overlaps(zombie.getBounds())) {
                 zombie.update(delta);
+                for (Bullet bullet : world.getBullets()) {
+                    if (aabbContainsSegment(bullet.getPosition(), bullet.getPosition().cpy().add(bullet.getVelocity().cpy().clamp(0.8f,0.8f)), new Rectangle(zombie.getBounds()).setWidth(0.3f).setCenter(zombie.getBounds().getCenter(new Vector2())))) {
+                        world.deleteBullet(bullet);
+                        world.killZombie(zombie);
+                    }
+                }
             }
             else {
-                zombies.removeValue(zombie, false);
+                world.killZombie(zombie);
             }
         }
     }
+
+    public boolean aabbContainsSegment (Vector2 position1, Vector2 position2, Rectangle rectangle) {
+        // Completely outside.
+        if ((position1.x <= rectangle.x && position2.x <= rectangle.x) || (position1.y <= rectangle.y && position2.y <= rectangle.y) || (position1.x >= rectangle.x+rectangle.width && position2.x >= rectangle.x+rectangle.width) || (position1.y >= rectangle.y+rectangle.height && position2.y >= rectangle.y+rectangle.height))
+            return false;
+
+        float m = (position2.y - position1.y) / (position2.x - position1.x);
+
+        float y = m * (rectangle.x - position1.x) + position1.y;
+        if (y > rectangle.y && y < rectangle.y+rectangle.height) return true;
+
+        y = m * (rectangle.x+rectangle.width - position1.x) + position1.y;
+        if (y > rectangle.y && y < rectangle.y+rectangle.height) return true;
+
+        float x = (rectangle.y - position1.y) / m + position1.x;
+        if (x > rectangle.x && x < rectangle.x+rectangle.width) return true;
+
+        x = (rectangle.y+rectangle.height - position1.y) / m + position1.x;
+        if (x > rectangle.x && x < rectangle.x+rectangle.width) return true;
+
+        return false;
+    }
+
 }

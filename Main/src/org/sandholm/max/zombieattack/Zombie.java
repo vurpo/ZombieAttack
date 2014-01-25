@@ -10,7 +10,9 @@ import java.util.Random;
  */
 public class Zombie {
 
-    static final float SPEED = 1.5f;
+    static final float SPEED = 1.75f;
+
+    float sizeModifier;
 
     Vector2 velocity = new Vector2();
     Rectangle bounds = new Rectangle();
@@ -18,15 +20,16 @@ public class Zombie {
     boolean facingLeft;
     World world;
 
-    int health = 100;
+    float health = 1f;
 
     public Zombie(Vector2 position, boolean facingLeft, World world) {
         this.world = world;
         this.bounds.setPosition(position);
-        this.bounds.height = 1f;
-        this.bounds.width = 0.5f;
         this.facingLeft = facingLeft;
-        velocity.x = (random.nextFloat()-0.5f) + SPEED;
+        sizeModifier = random.nextFloat()-0.3f;
+        this.bounds.height = 1f+(-sizeModifier/2);
+        this.bounds.width = 0.5f+(-sizeModifier/4);
+        velocity.x = (sizeModifier * 3f) + SPEED;
         if (facingLeft) {
             velocity.x = -velocity.x;
         }
@@ -47,7 +50,7 @@ public class Zombie {
 
     public void update(float delta) {
         Vector2 position = getPosition();
-        bounds.setPosition(position.add(velocity.cpy().scl(delta)));
+        bounds.setPosition(position.add(velocity.cpy().scl(delta).scl((health*0.75f)+0.25f)));
     }
 
     public Rectangle getBounds() {

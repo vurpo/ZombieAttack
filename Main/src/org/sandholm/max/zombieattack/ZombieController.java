@@ -13,7 +13,8 @@ public class ZombieController {
     World world;
     Array<Zombie> zombies;
     int spawnZombieTimeout;
-    int zombieFrequency = 90;
+    int zombieFrequency = 80;
+    float timeCount = 0f;
     Random random = new Random();
 
     public ZombieController(World world) {
@@ -23,6 +24,13 @@ public class ZombieController {
     }
 
     public void update(float delta) {
+        timeCount += delta;
+        if (timeCount >= 4f) {
+            if (zombieFrequency >= 5) {
+                zombieFrequency /= 1.05f;
+            }
+            timeCount = 0f;
+        }
         if (spawnZombieTimeout == 0) {
             world.spawnZombie(random.nextBoolean());
             spawnZombieTimeout = (random.nextInt(20)+zombieFrequency);

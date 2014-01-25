@@ -99,6 +99,11 @@ public class PlayerController {
     public void update(float delta) {
         lastDelta = delta;
         processInput();
+        for (Zombie zombie : world.getZombies()) {
+            if (player.getBounds().overlaps(zombie.getBounds())) {
+                player.damage(0.005f*(-zombie.sizeModifier+0.8f));
+            }
+        }
         player.update(delta);
     }
 

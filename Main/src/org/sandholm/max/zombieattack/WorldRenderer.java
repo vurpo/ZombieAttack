@@ -105,7 +105,7 @@ public class WorldRenderer {
         else {                                                                                   //if pointing left
             geometryRenderer.rectLine(0.23f, -0.03f*gunViewAngle, 0.4f, -0.03f*gunViewAngle, 0.03f); //draw the gun
             geometryRenderer.rectLine(0.23f, -0.03f*gunViewAngle, 0.16f, 0.03f*gunViewAngle, 0.02f);
-            player.setBarrelEnd(new Vector2(0.4f, -0.03f*gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
+            player.setBarrelEnd(new Vector2(0.4f, -0.03f * gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
         }
         geometryRenderer.identity();
         //draw all bullets
@@ -113,6 +113,9 @@ public class WorldRenderer {
         for (Bullet bullet : bullets) {
             geometryRenderer.rectLine(bullet.getPosition(), bullet.getPosition().cpy().add(bullet.getVelocity().cpy().clamp(0.8f,0.8f)), 0.01f);
         }
+        //draw the health bar
+        geometryRenderer.setColor(1f-player.getHealth(), player.getHealth(), 0f, 1f);
+        geometryRenderer.rect(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3f*player.getHealth(), -0.5f);
         geometryRenderer.end();
     }
 

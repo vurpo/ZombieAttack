@@ -23,7 +23,7 @@ public class Player {
 
     public boolean jumping = false;
 
-    static final float SPEED = 3.0f;
+    static final float SPEED = 2.5f;
     static final float JUMP_VELOCITY =  2.0f;
     static final float BULLET_VELOCITY = 48f;
 
@@ -38,8 +38,21 @@ public class Player {
     float gunAngle;
     float fireFrequency;
 
-    int health = 100;
+    public float getHealth() {
+        return health;
+    }
+
+    float health = 1f;
     int bullets = 100;
+
+    public void damage(float amount) {
+        if (health - amount >= 0) {
+            health -= amount;
+        }
+        else {
+            health = 0f;
+        }
+    }
 
     public Player(Vector2 position, World world) {
         this.bounds.setPosition(position);
@@ -59,7 +72,7 @@ public class Player {
         if (velocity.y != 0f) {
             velocity.y -= 8*delta;  //I'm falling!
         }
-        position.add(velocity.cpy().scl(delta));
+        position.add(velocity.cpy().scl(delta).scl((health*0.75f)+0.25f));
         if (!isInsideLevelBounds(delta)){
             velocity.x = 0f;
             setState(State.IDLE); //we don't want the player to walk out of the world

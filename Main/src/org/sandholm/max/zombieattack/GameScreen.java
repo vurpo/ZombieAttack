@@ -98,7 +98,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
             if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftPressed();
             else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightPressed();
             else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpPressed();
-            else if (i == Ouya.BUTTON_R1) {
+            else if (i == Ouya.BUTTON_R1 || i == Ouya.BUTTON_R2) {
                 playerController.fireBullet();
             }
             return true;

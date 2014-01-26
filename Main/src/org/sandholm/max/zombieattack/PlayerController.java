@@ -92,7 +92,7 @@ public class PlayerController {
     }
 
     public void fireBullet() {
-        world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY);
+        world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY*player.getArmLength());
     }
 
     /** The main update method **/
@@ -147,9 +147,11 @@ public class PlayerController {
             player.jump();
         }
 
+        rightAxis.clamp(0f, 1f);
         //gun controls
-        if (rightAxis.len() > 0.5f) { //deadzone
+        if (rightAxis.len() > 0.1f) { //deadzone
             player.setGunAngle(rightAxis.angle());
+            player.setArmLength(rightAxis.len());
         }
 
         player.setFireFrequency(rightTrigger);

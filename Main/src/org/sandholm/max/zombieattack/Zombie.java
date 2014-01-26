@@ -17,7 +17,8 @@ public class Zombie {
     Vector2 velocity = new Vector2();
     Rectangle bounds = new Rectangle();
     Random random = new Random();
-    boolean facingLeft;
+    boolean rightOfPlayer;
+    float distanceToPlayer;
     World world;
 
     float health = 1f;
@@ -25,7 +26,7 @@ public class Zombie {
     public Zombie(Vector2 position, boolean facingLeft, World world) {
         this.world = world;
         this.bounds.setPosition(position);
-        this.facingLeft = facingLeft;
+        this.rightOfPlayer = facingLeft;
         sizeModifier = random.nextFloat()-0.3f;
         this.bounds.height = 1f+(-sizeModifier/2);
         this.bounds.width = 0.5f+(-sizeModifier/4);
@@ -35,9 +36,9 @@ public class Zombie {
         }
     }
 
-    public boolean damage(int amount) {  //returns true if zombie died
-        health -= amount;
-        if (health <= 0) {
+    public boolean damage(float amount) {  //returns true if zombie died
+        health -= amount+(sizeModifier*0.2f);
+        if (health <= 0f) {
             die();
             return true;
         }
@@ -49,6 +50,13 @@ public class Zombie {
     }
 
     public void update(float delta) {
+        /*this.rightOfPlayer = getBounds().getCenter(new Vector2()).x >= world.getPlayer().getBounds().getCenter(new Vector2()).x;
+        if (this.rightOfPlayer) {
+            velocity.x = Math.abs(velocity.x)*-1;
+        }
+        else {
+            velocity.x = Math.abs(velocity.x);
+        }*/
         Vector2 position = getPosition();
         bounds.setPosition(position.add(velocity.cpy().scl(delta).scl((health*0.75f)+0.25f)));
     }

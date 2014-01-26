@@ -17,6 +17,14 @@ public class Player {
         this.velocity = velocity;
     }
 
+    public void setArmLength(float armLength) {
+        this.armLength = armLength;
+    }
+
+    public float getArmLength() {
+        return armLength;
+    }
+
     public enum State {
         IDLE, WALKING
     }
@@ -36,6 +44,7 @@ public class Player {
     State state = State.IDLE;
     boolean facingLeft = true;
     float gunAngle;
+    float armLength;
     float fireFrequency;
 
     public float getHealth() {
@@ -45,12 +54,14 @@ public class Player {
     float health = 1f;
     int bullets = 100;
 
-    public void damage(float amount) {
+    public boolean damage(float amount) {
         if (health - amount >= 0) {
             health -= amount;
+            return false; //didn't die
         }
         else {
             health = 0f;
+            return true;  //died
         }
     }
 

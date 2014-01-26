@@ -23,20 +23,29 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     private ZombieController zombieController;
     private BulletController bulletController;
 
+    public boolean gameOver = false;
+
     private boolean runningOnOuya;
     private boolean controllerIsOuya;
     private Controller controller;
 
     @Override
     public void render(float delta) {
+        if (world.getPlayer().getHealth() <= 0f) {
+            gameOver = true;
+        }
         Gdx.gl.glClearColor(1f, 1f, 1f, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        playerController.update(delta);
-        zombieController.update(delta);
-        renderer.render();
-        bulletController.update(delta);
+        if (!gameOver) {
+            playerController.update(delta);
+            zombieController.update(delta);
+            renderer.render(false);
+            bulletController.update(delta);
+        }
+        else {
+            renderer.render(true);
+        }
     }
-
 
     @Override
     public void resize(int w, int h) {
@@ -64,12 +73,10 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -138,9 +145,11 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
             }
             else if (i == Ouya.AXIS_RIGHT_Y) {
                 playerController.rightYAxis(v);
+                return true;
             }
             else if (i == Ouya.AXIS_RIGHT_TRIGGER) {
                 playerController.rightTrigger(v);
+                return true;
             }
         }
         return false;

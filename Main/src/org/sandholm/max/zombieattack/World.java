@@ -9,6 +9,10 @@ import com.badlogic.gdx.utils.Array;
  */
 public class World {
 
+    int bulletsShot = 0;
+    int hits = 0;
+    int zombiesKilled = 0;
+
     public Rectangle getLevelBounds() {
         return levelBounds;
     }
@@ -44,6 +48,7 @@ public class World {
     }
 
     public Bullet spawnBullet (Vector2 position, float direction, float velocity) {
+        bulletsShot += 1;
         bullets.add(new Bullet(position, direction, velocity));
         return bullets.peek();
     }

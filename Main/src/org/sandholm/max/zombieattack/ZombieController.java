@@ -42,6 +42,7 @@ public class ZombieController {
                 for (Bullet bullet : world.getBullets()) {
                     if (aabbContainsSegment(bullet.getPosition(), bullet.getPosition().cpy().add(bullet.getVelocity().cpy().clamp(0.8f,0.8f)), new Rectangle(zombie.getBounds()).setWidth(0.3f).setCenter(zombie.getBounds().getCenter(new Vector2())))) {
                         zombie.damage(0.2f);
+                        world.hits += 1;
                         world.deleteBullet(bullet);
                     }
                 }

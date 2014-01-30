@@ -45,7 +45,6 @@ public class Player {
     boolean facingLeft = true;
     float gunAngle;
     float armLength;
-    float fireFrequency;
 
     public float getHealth() {
         return health;
@@ -132,14 +131,6 @@ public class Player {
 
     public void setGunAngle(float gunAngle) {
         this.gunAngle = gunAngle;
-    }
-
-    public float getFireFrequency() {
-        return fireFrequency;
-    }
-
-    public void setFireFrequency(float fireFrequency) {
-        this.fireFrequency = fireFrequency;
     }
 
     public Vector2 getBarrelEnd() {

@@ -46,17 +46,21 @@ public class Zombie {
     }
 
     public void die() {
+        world.zombiesKilled += 1;
         world.killZombie(this);
     }
 
     public void update(float delta) {
-        /*this.rightOfPlayer = getBounds().getCenter(new Vector2()).x >= world.getPlayer().getBounds().getCenter(new Vector2()).x;
-        if (this.rightOfPlayer) {
-            velocity.x = Math.abs(velocity.x)*-1;
+        distanceToPlayer = world.getPlayer().getBounds().getCenter(new Vector2()).x-getBounds().getCenter(new Vector2()).x;
+        if (Math.abs(distanceToPlayer) <= 1f) {
+            velocity.x = ((sizeModifier * 3f) + SPEED) * distanceToPlayer;
         }
-        else {
-            velocity.x = Math.abs(velocity.x);
-        }*/
+        else if (distanceToPlayer < -1f) {
+            velocity.x = ((sizeModifier * 3f) + SPEED) * -1;
+        }
+        else if (distanceToPlayer > 1f) {
+            velocity.x = (sizeModifier * 3f) + SPEED;
+        }
         Vector2 position = getPosition();
         bounds.setPosition(position.add(velocity.cpy().scl(delta).scl((health*0.75f)+0.25f)));
     }

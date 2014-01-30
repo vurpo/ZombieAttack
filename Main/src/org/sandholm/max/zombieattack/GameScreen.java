@@ -1,15 +1,13 @@
 package org.sandholm.max.zombieattack;
 
 import com.badlogic.gdx.Gdx;
-
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.controllers.mappings.Ouya;
-
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.math.Vector3;
 
@@ -23,14 +21,24 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     private ZombieController zombieController;
     private BulletController bulletController;
 
+    public float timePassed = 0f;
     public boolean gameOver = false;
 
     private boolean runningOnOuya;
     private boolean controllerIsOuya;
     private Controller controller;
 
+    private ZombieGame game;
+
+    public GameScreen(ZombieGame game) {
+        this.game = game;
+    }
+
     @Override
     public void render(float delta) {
+        if (!gameOver) {
+            timePassed += delta;
+        }
         if (world.getPlayer().getHealth() <= 0f) {
             gameOver = true;
         }
@@ -39,11 +47,19 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
         if (!gameOver) {
             playerController.update(delta);
             zombieController.update(delta);
-            renderer.render(false);
+            renderer.render(false, 0f, 0, 0, 0);
             bulletController.update(delta);
         }
         else {
-            renderer.render(true);
+            renderer.render(true, Math.round(timePassed*100)/100f, world.bulletsShot, world.hits, world.zombiesKilled);
+        }
+    }
+
+    private void restartGame() {
+        if (gameOver) {
+            show();
+            timePassed = 0f;
+            gameOver = false;
         }
     }
 
@@ -64,6 +80,10 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
         }
         Controllers.addListener(this);
         Gdx.input.setInputProcessor(this);
+        if (gameOver) {
+            timePassed = 0f;
+            gameOver = false;
+        }
     }
 
     @Override
@@ -102,11 +122,18 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     @Override
     public boolean buttonDown(Controller controller, int i) {
         if (controller == this.controller) {
-            if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftPressed();
-            else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightPressed();
-            else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpPressed();
-            else if (i == Ouya.BUTTON_R1 || i == Ouya.BUTTON_R2) {
-                playerController.fireBullet();
+            if (!gameOver) {
+                if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftPressed();
+                else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightPressed();
+                else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpPressed();
+                else if (i == Ouya.BUTTON_R1 || i == Ouya.BUTTON_R2) playerController.fireBullet();
+            }
+            //restart game on game over
+            else if (i == Ouya.BUTTON_O) restartGame();
+            //back to title screen
+            else if (i == Ouya.BUTTON_A) {
+                Controllers.removeListener(this);
+                game.setScreen(game.titleScreen);
             }
             return true;
         }
@@ -116,9 +143,11 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     @Override
     public boolean buttonUp(Controller controller, int i) {
         if (controller == this.controller) {
-            if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftReleased();
-            else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightReleased();
-            else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpReleased();
+            if (!gameOver) {
+                if (i == Ouya.BUTTON_DPAD_LEFT) playerController.leftReleased();
+                else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightReleased();
+                else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpReleased();
+            }
             return true;
         }
         return false;

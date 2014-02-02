@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
  * Created by max on 1/17/14.
  */
 public class World {
+    public static float GRAVITY = 4.905f;
 
     int bulletsShot = 0;
     int hits = 0;
@@ -18,11 +19,10 @@ public class World {
     }
 
     private Rectangle levelBounds = new Rectangle();
+
     Player player;
-
     Array<Zombie> zombies = new Array<Zombie>();
-
-
+    Array<AmmoPack> ammoPacks = new Array<AmmoPack>();
     Array<Bullet> bullets = new Array<Bullet>();
 
     public Player getPlayer() {
@@ -37,6 +37,10 @@ public class World {
             zombies.add(new Zombie(new Vector2(levelBounds.width-0.05f, levelBounds.y), true, this));
         }
         return zombies.peek();
+    }
+
+    public void spawnAmmoPack(Vector2 position) {
+        ammoPacks.add(new AmmoPack(position, this));
     }
 
     public void killZombie(Zombie zombie){
@@ -71,5 +75,9 @@ public class World {
         levelBounds.height = 5.0f;
         levelBounds.x = 0f;
         levelBounds.y = 4.0f;
+    }
+
+    public Array<AmmoPack> getAmmoPacks() {
+        return ammoPacks;
     }
 }

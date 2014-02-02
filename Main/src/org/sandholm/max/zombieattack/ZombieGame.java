@@ -7,8 +7,8 @@ import com.badlogic.gdx.Screen;
  * Created by max on 1/17/14.
  */
 class ZombieGame extends Game {
-    public Screen gameScreen;
-    public Screen titleScreen;
+    public GameScreen gameScreen;
+    public TitleScreen titleScreen;
 
     @Override
     public void create() {

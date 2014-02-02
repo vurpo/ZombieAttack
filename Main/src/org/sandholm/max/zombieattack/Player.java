@@ -1,7 +1,10 @@
 package org.sandholm.max.zombieattack;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Created by max on 1/17/14.
@@ -15,14 +18,6 @@ public class Player {
 
     public void setVelocity(Vector2 velocity) {
         this.velocity = velocity;
-    }
-
-    public void setArmLength(float armLength) {
-        this.armLength = armLength;
-    }
-
-    public float getArmLength() {
-        return armLength;
     }
 
     public enum State {
@@ -44,7 +39,10 @@ public class Player {
     State state = State.IDLE;
     boolean facingLeft = true;
     float gunAngle;
-    float armLength;
+
+    private Texture standingTexture;
+    private Array<Texture> runningTextures = new Array<Texture>();
+    private Texture jumpingTexture;
 
     public float getHealth() {
         return health;
@@ -64,7 +62,16 @@ public class Player {
         }
     }
 
+    private void loadTextures() {
+        standingTexture = new Texture(Gdx.files.internal("guy_1080.png"));
+    }
+
+    public Texture getCurrentTexture() {
+        return standingTexture;
+    }
+
     public Player(Vector2 position, World world) {
+        loadTextures();
         this.bounds.setPosition(position);
         this.bounds.height = 1f;
         this.bounds.width = 0.5f;

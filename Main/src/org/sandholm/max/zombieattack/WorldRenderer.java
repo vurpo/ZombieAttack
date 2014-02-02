@@ -27,11 +27,10 @@ public class WorldRenderer {
 
     ShapeRenderer geometryRenderer = new ShapeRenderer();
 
-    private Texture playerTexture;
     private Texture zombieTexture;
     private Texture gameOverTexture;
     private BitmapFont font;
-    private SpriteBatch spriteBatch;
+    public SpriteBatch spriteBatch;
 
     private boolean debug;
 
@@ -54,7 +53,6 @@ public class WorldRenderer {
     }
 
     private void loadTextures() {
-        playerTexture = new Texture(Gdx.files.internal("guy_1080.png"));
         zombieTexture = new Texture(Gdx.files.internal("zombie_1080.png"));
         gameOverTexture = new Texture(Gdx.files.internal("gameoverscreen.png"));
         font = new BitmapFont(Gdx.files.internal("Ubuntu-R-32.fnt"), Gdx.files.internal("Ubuntu-R.png"), false);
@@ -64,6 +62,7 @@ public class WorldRenderer {
         spriteBatch.begin();
             drawZombies();
             drawPlayer();
+            drawAmmoPacks();
         spriteBatch.end();
         drawLines();
         if(debug){
@@ -89,7 +88,7 @@ public class WorldRenderer {
 
     private void drawPlayer() {
         Player player = world.getPlayer();
-        spriteBatch.draw(playerTexture, (player.getPosition().x)*ppuX, player.getPosition().y*ppuY
+        spriteBatch.draw(player.getCurrentTexture(), (player.getPosition().x)*ppuX, player.getPosition().y*ppuY
                        , player.getBounds().width*ppuX, player.getBounds().height*ppuY);
     }
 
@@ -98,6 +97,14 @@ public class WorldRenderer {
         for (Zombie zombie : zombies) {
             spriteBatch.draw(zombieTexture, (zombie.getPosition().x)*ppuX, zombie.getPosition().y*ppuY
                     , zombie.getBounds().width*ppuX, zombie.getBounds().height*ppuY);
+        }
+    }
+
+    private void drawAmmoPacks() {
+        Array<AmmoPack> ammoPacks = world.getAmmoPacks();
+        for (AmmoPack ammoPack : ammoPacks) {
+            spriteBatch.draw(ammoPack.getTexture(), ammoPack.getPosition().x*ppuX, ammoPack.getPosition().y*ppuY
+                           , ammoPack.getBounds().width*ppuX, ammoPack.getBounds().height*ppuY);
         }
     }
 
@@ -115,26 +122,24 @@ public class WorldRenderer {
         Vector2 playerPosition = player.getPosition();
 
         geometryRenderer.translate(playerPosition.x + 0.26f, playerPosition.y + 0.7f, 0f);      //translate to shoulder
-        float armLength = player.getArmLength();
-        if (armLength <= 0.3f) armLength = 1f;
         float gunViewAngle = Math.abs((player.getGunAngle() % 180)-90)/90f; //this guy tilts the gun, but how much?
         geometryRenderer.rotate(0f, 0f, 1f, player.getGunAngle());                                 //rotate the arm
-        geometryRenderer.scale(armLength, gunViewAngle, 1f);
+        //geometryRenderer.scale(armLength, gunViewAngle, 1f);
         if (player.getGunAngle() < 90 || player.getGunAngle() > 270) {                          //if pointing right
-            geometryRenderer.rectLine(0f, 0f, 0.115f, -(0.1f-armLength*0.05f), 0.015f);                              //draw the arm
-            geometryRenderer.rectLine(0.115f, -(0.1f-armLength*0.05f), 0.23f, 0f, 0.015f);
+            geometryRenderer.rectLine(0f, 0f, 0.115f, -0.05f, 0.015f);                              //draw the arm
+            geometryRenderer.rectLine(0.115f, -0.05f, 0.23f, 0f, 0.015f);
             geometryRenderer.rectLine(0f, 0f, 0.3f, 0.03f, 0.015f);
             geometryRenderer.rectLine(0.23f, 0.03f, 0.4f, 0.03f, 0.03f);   //draw the gun
             geometryRenderer.rectLine(0.23f, 0.03f, 0.16f, -0.03f, 0.02f);
-            player.setBarrelEnd(new Vector2(0.4f*armLength, 0.03f*gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
+            player.setBarrelEnd(new Vector2(0.4f, 0.03f*gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
         }
         else {                                                                                   //if pointing left
-            geometryRenderer.rectLine(0f, 0f, 0.115f, (0.1f-armLength*0.05f), 0.015f);                              //draw the arm
-            geometryRenderer.rectLine(0.115f, (0.1f-armLength*0.05f), 0.23f, 0f, 0.015f);
+            geometryRenderer.rectLine(0f, 0f, 0.115f, 0.05f, 0.015f);                              //draw the arm
+            geometryRenderer.rectLine(0.115f, 0.05f, 0.23f, 0f, 0.015f);
             geometryRenderer.rectLine(0f, 0f, 0.3f, -0.03f, 0.015f);
             geometryRenderer.rectLine(0.23f, -0.03f, 0.4f, -0.03f, 0.03f); //draw the gun
             geometryRenderer.rectLine(0.23f, -0.03f, 0.16f, 0.03f, 0.02f);
-            player.setBarrelEnd(new Vector2(0.4f*armLength, -0.03f * gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
+            player.setBarrelEnd(new Vector2(0.4f, -0.03f * gunViewAngle).setAngle(player.getGunAngle()));//we're just saving the end of the barrel while we can
         }
         geometryRenderer.identity();
         //draw all bullets
@@ -143,14 +148,10 @@ public class WorldRenderer {
             geometryRenderer.rectLine(bullet.getPosition(), bullet.getPosition().cpy().add(bullet.getVelocity().cpy().clamp(0.8f*(bullet.getVelocity().len()/Player.BULLET_VELOCITY),0.8f*(bullet.getVelocity().len()/Player.BULLET_VELOCITY))), 0.01f);
         }
         //draw the health bar
-        geometryRenderer.setColor(Math.min(1f, (1f-player.getHealth())*2f), Math.min(1f, player.getHealth()*2f), 0f, 1f);
-        geometryRenderer.rect(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3f*player.getHealth(), -0.25f);
-        geometryRenderer.setColor(0f, 0f, 0f, 1f);
-        geometryRenderer.rectLine(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 0.01f);
-        geometryRenderer.rectLine(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.5f, 3.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.5f, 0.01f);
-        geometryRenderer.rectLine(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.5f, 0.01f);
-        geometryRenderer.rectLine(3.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.5f, 0.01f);
-
+        geometryRenderer.setColor(1f, 1f, 1f, 1f);
+        geometryRenderer.rect(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3f, -0.25f);
+        geometryRenderer.setColor(Math.min(1f, (1f - player.getHealth()) * 2f), Math.min(1f, player.getHealth() * 2f), 0f, 1f);
+        geometryRenderer.rect(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3f * player.getHealth(), -0.25f);
         geometryRenderer.end();
     }
 

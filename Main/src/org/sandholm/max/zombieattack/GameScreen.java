@@ -20,6 +20,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
     private PlayerController playerController;
     private ZombieController zombieController;
     private BulletController bulletController;
+    private AmmoPackController ammoPackController;
 
     public float timePassed = 0f;
     public boolean gameOver = false;
@@ -42,11 +43,12 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
         if (world.getPlayer().getHealth() <= 0f) {
             gameOver = true;
         }
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1);
+        Gdx.gl.glClearColor(0.7f, 0.8f, 0.7f, 1f);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         if (!gameOver) {
             playerController.update(delta);
             zombieController.update(delta);
+            ammoPackController.update(delta);
             renderer.render(false, 0f, 0, 0, 0);
             bulletController.update(delta);
         }
@@ -75,15 +77,20 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
         playerController = new PlayerController(world);
         zombieController = new ZombieController(world);
         bulletController = new BulletController(world);
-        if (Controllers.getControllers().size >= 1) {
-            controller = Controllers.getControllers().first();
-        }
+        ammoPackController = new AmmoPackController(world);
+        //if (Controllers.getControllers().size >= 1) {
+        //    controller = Controllers.getControllers().first();
+        //}
         Controllers.addListener(this);
         Gdx.input.setInputProcessor(this);
         if (gameOver) {
             timePassed = 0f;
             gameOver = false;
         }
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     @Override
@@ -133,6 +140,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
             //back to title screen
             else if (i == Ouya.BUTTON_A) {
                 Controllers.removeListener(this);
+                renderer.spriteBatch.dispose();
                 game.setScreen(game.titleScreen);
             }
             return true;

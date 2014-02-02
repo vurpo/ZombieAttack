@@ -25,7 +25,7 @@ public class PlayerController {
         keys.put(Keys.RIGHT, false);
         keys.put(Keys.JUMP, false);
         keys.put(Keys.FIRE, false);
-    };
+    }
 
     public PlayerController(World world) {
         this.world = world;
@@ -92,7 +92,7 @@ public class PlayerController {
     }
 
     public void fireBullet() {
-        world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY*player.getArmLength());
+        world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY);
     }
 
     float fireFrequency = -1f;
@@ -100,7 +100,7 @@ public class PlayerController {
     float fireCounter = 0f;
     private void setFireFrequency(float trigger) {
         if (trigger > 0.1f) {
-            fireFrequency = 0.125f-(trigger*0.125f)+0.125f;
+            fireFrequency = 1f-(trigger*0.6f);
         }
         else {
             fireFrequency = -1f;
@@ -110,11 +110,11 @@ public class PlayerController {
     /** The main update method **/
     public void update(float delta) {
         processInput();
-        if (fireFrequency >= 0.125f && fireCounter <= 0f) {
+        if (rightTrigger > 0.1f && fireCounter <= 0f) {
             fireBullet();
             fireCounter = fireFrequency;
         }
-        else if (fireFrequency >= 0.125f) {
+        else if (rightTrigger > 0.1f) {
             fireCounter -= delta;
         }
         for (Zombie zombie : world.getZombies()) {
@@ -169,7 +169,6 @@ public class PlayerController {
         //gun controls
         if (rightAxis.len() > 0.1f) { //deadzone
             player.setGunAngle(rightAxis.angle());
-            player.setArmLength(rightAxis.cpy().clamp(0f, 1f).len());
         }
 
         setFireFrequency(rightTrigger);

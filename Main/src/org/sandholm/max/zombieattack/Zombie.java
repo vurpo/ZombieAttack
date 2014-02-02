@@ -47,6 +47,9 @@ public class Zombie {
 
     public void die() {
         world.zombiesKilled += 1;
+        if (random.nextInt(4) == 1) {
+            world.spawnAmmoPack(new Vector2(getPosition().x, getPosition().y+0.5f));
+        }
         world.killZombie(this);
     }
 

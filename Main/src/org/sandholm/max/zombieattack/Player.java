@@ -49,7 +49,7 @@ public class Player {
     }
 
     float health = 1f;
-    int bullets = 100;
+    int ammo = 100;
 
     public boolean damage(float amount) {
         if (health - amount >= 0) {
@@ -60,6 +60,14 @@ public class Player {
             health = 0f;
             return true;  //died
         }
+    }
+
+    public void addAmmo(int amount) {
+        ammo += amount;
+    }
+
+    public int getAmmo() {
+        return ammo;
     }
 
     private void loadTextures() {

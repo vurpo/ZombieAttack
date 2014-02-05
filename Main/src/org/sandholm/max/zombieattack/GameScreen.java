@@ -24,6 +24,7 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
 
     public float timePassed = 0f;
     public boolean gameOver = false;
+    public boolean paused = false;
 
     private boolean runningOnOuya;
     private boolean controllerIsOuya;
@@ -45,15 +46,18 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
         }
         Gdx.gl.glClearColor(0.7f, 0.8f, 0.7f, 1f);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        if (!gameOver) {
+        if (!gameOver && !paused) {
             playerController.update(delta);
             zombieController.update(delta);
             ammoPackController.update(delta);
-            renderer.render(false, 0f, 0, 0, 0);
+            renderer.render(false, false, 0f, 0, 0, 0);
             bulletController.update(delta);
         }
-        else {
-            renderer.render(true, Math.round(timePassed*100)/100f, world.bulletsShot, world.hits, world.zombiesKilled);
+        else if (gameOver) {
+            renderer.render(false, true, Math.round(timePassed*100)/100f, world.bulletsShot, world.hits, world.zombiesKilled);
+        }
+        else if (paused) {
+            renderer.render(true, false, 0f, 0, 0, 0);
         }
     }
 
@@ -134,6 +138,8 @@ public class GameScreen implements Screen, ControllerListener, InputProcessor {
                 else if (i == Ouya.BUTTON_DPAD_RIGHT) playerController.rightPressed();
                 else if (i == Ouya.BUTTON_DPAD_UP) playerController.jumpPressed();
                 else if (i == Ouya.BUTTON_R1 || i == Ouya.BUTTON_R2) playerController.fireBullet();
+                //pause/unpause
+                else if (i == Ouya.BUTTON_MENU && !gameOver) paused = !paused;
             }
             //restart game on game over
             else if (i == Ouya.BUTTON_O) restartGame();

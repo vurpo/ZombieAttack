@@ -43,6 +43,10 @@ public class World {
         ammoPacks.add(new AmmoPack(position, this));
     }
 
+    public void removeAmmoPack(AmmoPack ammoPack) {
+        ammoPacks.removeValue(ammoPack, false);
+    }
+
     public void killZombie(Zombie zombie){
         zombies.removeValue(zombie, false);
     }

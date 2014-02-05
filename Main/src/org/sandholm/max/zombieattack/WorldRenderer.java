@@ -30,6 +30,7 @@ public class WorldRenderer {
     private Texture zombieTexture;
     private Texture gameOverTexture;
     private BitmapFont font;
+    private BitmapFont bigFont;
     public SpriteBatch spriteBatch;
 
     private boolean debug;
@@ -56,13 +57,17 @@ public class WorldRenderer {
         zombieTexture = new Texture(Gdx.files.internal("zombie_1080.png"));
         gameOverTexture = new Texture(Gdx.files.internal("gameoverscreen.png"));
         font = new BitmapFont(Gdx.files.internal("Ubuntu-R-32.fnt"), Gdx.files.internal("Ubuntu-R.png"), false);
+        bigFont = new BitmapFont(Gdx.files.internal("Ubuntu-R-144.fnt"), Gdx.files.internal("Ubuntu-R.png"), false);
+        font.setColor(0f, 0f, 0f, 1f);
+        bigFont.setColor(0f, 0f, 0f, 1f);
     }
 
-    public void render(boolean gameOver, float timePassed, int bulletsShot, int hits, int zombiesKilled) {
+    public void render(boolean paused, boolean gameOver, float timePassed, int bulletsShot, int hits, int zombiesKilled) {
         spriteBatch.begin();
             drawZombies();
             drawPlayer();
             drawAmmoPacks();
+            drawHudText();
         spriteBatch.end();
         drawLines();
         if(debug){
@@ -72,8 +77,7 @@ public class WorldRenderer {
             Rectangle gameOverWindow = new Rectangle(Gdx.graphics.getWidth()/2-gameOverTexture.getWidth()/2, Gdx.graphics.getHeight()/2-gameOverTexture.getHeight()/2
                                                    , gameOverTexture.getWidth(), gameOverTexture.getHeight());
             spriteBatch.begin();
-                spriteBatch.draw(gameOverTexture, gameOverWindow.x, gameOverWindow.y, gameOverWindow.width, gameOverWindow.height);
-                font.setColor(0f, 0f, 0f, 1f);
+                //spriteBatch.draw(gameOverTexture, gameOverWindow.x, gameOverWindow.y, gameOverWindow.width, gameOverWindow.height);
                 float timeWidth = font.getBounds(timePassed+" seconds").width;
                 font.draw(spriteBatch, timePassed+" seconds", gameOverWindow.x+gameOverWindow.width-38.42f-timeWidth, gameOverWindow.y+316.518f);
                 float bulletsWidth = font.getBounds(bulletsShot+"").width;
@@ -83,6 +87,10 @@ public class WorldRenderer {
                 float zombiesWidth = font.getBounds(zombiesKilled+"").width;
                 font.draw(spriteBatch, zombiesKilled+"", gameOverWindow.x+gameOverWindow.width-38.42f-zombiesWidth, gameOverWindow.y+97.285f);
             spriteBatch.end();
+            drawStatusText("Game Over!");
+        }
+        if (paused) {
+            drawStatusText("Paused");
         }
     }
 
@@ -106,6 +114,17 @@ public class WorldRenderer {
             spriteBatch.draw(ammoPack.getTexture(), ammoPack.getPosition().x*ppuX, ammoPack.getPosition().y*ppuY
                            , ammoPack.getBounds().width*ppuX, ammoPack.getBounds().height*ppuY);
         }
+    }
+
+    private void drawHudText() {
+        font.draw(spriteBatch, "Ammo: "+world.getPlayer().getAmmo(), 0.5f*ppuX, (world.getLevelBounds().y+world.getLevelBounds().height-1f)*ppuY);
+    }
+
+    private void drawStatusText(String bigText) {
+        spriteBatch.begin();
+            float pausedWidth = bigFont.getBounds(bigText).width;
+            bigFont.draw(spriteBatch, bigText, 8f*ppuX-pausedWidth/2, 7f*ppuY);
+        spriteBatch.end();
     }
 
     private void drawLines() {
@@ -149,9 +168,9 @@ public class WorldRenderer {
         }
         //draw the health bar
         geometryRenderer.setColor(1f, 1f, 1f, 1f);
-        geometryRenderer.rect(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3f, -0.25f);
+        geometryRenderer.rect(0.5f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.5f, 3f, -0.25f);
         geometryRenderer.setColor(Math.min(1f, (1f - player.getHealth()) * 2f), Math.min(1f, player.getHealth() * 2f), 0f, 1f);
-        geometryRenderer.rect(0.25f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.25f, 3f * player.getHealth(), -0.25f);
+        geometryRenderer.rect(0.5f, (world.getLevelBounds().y + world.getLevelBounds().height) - 0.5f, 3f * player.getHealth(), -0.25f);
         geometryRenderer.end();
     }
 
@@ -164,7 +183,6 @@ public class WorldRenderer {
                          , world.getLevelBounds().width, world.getLevelBounds().height);
         // render player
         Player player = world.getPlayer();
-        Rectangle rect = player.getBounds();
         debugRenderer.setColor(new Color(1, 0, 0, 1));
         debugRenderer.rect(player.getPosition().x, player.getPosition().y, player.getBounds().width, player.getBounds().height);
         //draw zombies

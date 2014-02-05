@@ -92,7 +92,10 @@ public class PlayerController {
     }
 
     public void fireBullet() {
-        world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY);
+        if (player.getAmmo() > 0) {
+            world.spawnBullet(player.getBarrelEnd(), player.getGunAngle(), Player.BULLET_VELOCITY);
+            player.addAmmo(-1);
+        }
     }
 
     float fireFrequency = -1f;
@@ -120,6 +123,12 @@ public class PlayerController {
         for (Zombie zombie : world.getZombies()) {
             if (player.getBounds().overlaps(zombie.getBounds())) {
                 player.damage(0.005f*(-zombie.sizeModifier+0.8f));
+            }
+        }
+        for (AmmoPack ammoPack : world.getAmmoPacks()) {
+            if (player.getBounds().overlaps(ammoPack.getBounds())) {
+                player.addAmmo(50);
+                world.removeAmmoPack(ammoPack);
             }
         }
         player.update(delta);
